@@ -267,3 +267,4 @@ __pycache__/
 
 /MqttToTelegram/db
 /MqttToTelegram/Secrets
+*.tar
