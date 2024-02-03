@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>dotnet-MqttToTelegram-cc0ec13a-1cea-4e84-80f1-fdf85bebfca0</UserSecretsId>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<PublishProfile>DefaultContainer</PublishProfile>
 	</PropertyGroup>
 
 

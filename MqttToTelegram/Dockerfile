@@ -1,21 +1,27 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
-USER app
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
+ARG TARGETPLATFORM
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0-bullseye-slim-amd64 AS build
 WORKDIR /src
 COPY ["MqttToTelegram/MqttToTelegram.csproj", "MqttToTelegram/"]
-RUN dotnet restore "./MqttToTelegram/./MqttToTelegram.csproj"
+RUN dotnet restore "MqttToTelegram/MqttToTelegram.csproj"
 COPY . .
 WORKDIR "/src/MqttToTelegram"
-RUN dotnet build "./MqttToTelegram.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./MqttToTelegram.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+ARG TARGETPLATFORM
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+        RID=linux-x64 ; \
+    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+        RID=linux-arm64 ; \
+    elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
+        RID=linux-arm ; \
+    fi \
+    && dotnet publish -c Release -r $RID -o /app/publish /p:UseAppHost=false --self-contained false 
+
 
 FROM base AS final
 WORKDIR /app
