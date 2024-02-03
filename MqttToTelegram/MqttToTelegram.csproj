@@ -6,7 +6,6 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>dotnet-MqttToTelegram-cc0ec13a-1cea-4e84-80f1-fdf85bebfca0</UserSecretsId>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-		<PublishProfile>DefaultContainer</PublishProfile>
 	</PropertyGroup>
 
 
@@ -26,12 +25,12 @@
 	  </None>
 	</ItemGroup>
 
-	<ItemGroup Condition="Exists('Secrets/appsettings.json')">
+	<!--<ItemGroup Condition="Exists('Secrets/appsettings.json')">
 		<Content Remove="appsettings.json" />
 		<Content Include="Secrets/appsettings.json" Link="appsettings.json" CopyToOutputDirectory="Always"/>
 	</ItemGroup>
 	<ItemGroup Condition="Exists('Secrets/appsettings.Development.json')">
 		<Content Remove="appsettings.Development.json" />
 		<Content Include="Secrets/appsettings.Development.json" Link="appsettings.Development.json" CopyToOutputDirectory="Always"/>
-	</ItemGroup>
+	</ItemGroup>-->
 </Project>
