@@ -19,10 +19,5 @@ builder.Services.AddRebus(c=>c
 
 builder.Services.AutoRegisterHandlersFromAssemblyOf<Program>();
 
-
-var srcs = builder.Configuration.Sources;
-
-
-
 var host = builder.Build();
 host.Run();

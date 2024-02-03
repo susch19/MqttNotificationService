@@ -68,7 +68,7 @@ public class Worker : BackgroundService
     async Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs e)
     {
         var payload = e.ApplicationMessage.ConvertPayloadToString();
-        var asd = 5 + 5;
+
         if (e.ApplicationMessage.Topic == "esp/doorbell")
         {
             var obj = System.Text.Json.JsonSerializer.Deserialize<DoorbellObject>(payload)!;
