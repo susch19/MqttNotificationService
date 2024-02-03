@@ -4,7 +4,7 @@ WORKDIR /app
 
 ARG TARGETPLATFORM
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0-bullseye-slim-amd64 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim-amd64 AS build
 WORKDIR /src
 COPY ["MqttToTelegram/MqttToTelegram.csproj", "MqttToTelegram/"]
 RUN dotnet restore "MqttToTelegram/MqttToTelegram.csproj"
