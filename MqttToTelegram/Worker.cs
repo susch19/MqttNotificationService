@@ -3,6 +3,7 @@ using MQTTnet;
 using MQTTnet.Server;
 using Telegram.Bot;
 using Rebus.Bus;
+using System.Text.Json.Serialization;
 
 namespace MqttToTelegram;
 
@@ -45,7 +46,7 @@ public class Worker : BackgroundService
 
                     Console.WriteLine("The MQTT client is connected.");
                     var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder()
-                        .WithTopicFilter(f => f.WithTopic("esp/doorbell"))
+                        .WithTopicFilter(f => f.WithTopic("zigbee2mqtt/Türklingel"))
                         .WithTopicFilter(f => f.WithTopic("painless2mqtt/0x000000002d8909fe/state"))
                     .Build();
 
@@ -99,6 +100,6 @@ public class Worker : BackgroundService
 
 }
 
-public record DoorbellObject(string Action);
+public record DoorbellObject([property:JsonPropertyName("action")]string Action);
 
 public record LedStripState(string iP, int firmwareVersionNr, bool isConnected, string colorMode, int delay, int numberOfLeds, int brightness, int step, long colorNumber, int version, bool reverse, DateTime lastReceived);

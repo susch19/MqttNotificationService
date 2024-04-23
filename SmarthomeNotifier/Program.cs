@@ -98,6 +98,7 @@ async Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageRece
 
 public class DoorbellObject
 {
+    [JsonPropertyName("action")]
     public string Action { get; set; }
 }
 
