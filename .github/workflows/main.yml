@@ -44,7 +44,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.REPO_NAME }}
           
       - name: Build MqttToTelegram and push Docker image
-        uses: docker/build-push-action@v5.1.0
+        uses: docker/build-push-action@v5.3.0
         with:
           context: .
           platforms: linux/amd64,linux/arm/v7,linux/arm64
