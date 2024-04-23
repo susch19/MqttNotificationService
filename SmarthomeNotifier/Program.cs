@@ -36,7 +36,7 @@ using (var mqttClient = mqttFactory.CreateMqttClient())
 
                                 Console.WriteLine("The MQTT client is connected.");
                                 var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder()
-                                    .WithTopicFilter(f => f.WithTopic("zigbee2mqtt/Türklingel"))
+                                    .WithTopicFilter(f => f.WithTopic("zigbee2mqtt/TÃ¼rklingel"))
                                     .WithTopicFilter(f => f.WithTopic("painless2mqtt/0x000000002d8909fe/state"))
                                     .Build();
 
@@ -75,7 +75,7 @@ async Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageRece
 {
     var payload = e.ApplicationMessage.ConvertPayloadToString();
     var asd = 5 + 5;
-    if (e.ApplicationMessage.Topic == "zigbee2mqtt/Türklingel")
+    if (e.ApplicationMessage.Topic == "zigbee2mqtt/TÃ¼rklingel")
     {
         var obj = System.Text.Json.JsonSerializer.Deserialize<DoorbellObject>(payload)!;
         if (obj.Action == "pressed")
