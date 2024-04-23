@@ -73,7 +73,7 @@ public class Worker : BackgroundService
         if (e.ApplicationMessage.Topic == "zigbee2mqtt/Türklingel")
         {
             var obj = System.Text.Json.JsonSerializer.Deserialize<DoorbellObject>(payload)!;
-    
+
             bus.Send(obj);
 
         }
@@ -100,6 +100,8 @@ public class Worker : BackgroundService
 
 }
 
-public record DoorbellObject([property:JsonPropertyName("action")]string Action);
+public record DoorbellObject(
+    [property: JsonPropertyName("action")] string Action,
+    [property: JsonPropertyName("state")] bool State);
 
 public record LedStripState(string iP, int firmwareVersionNr, bool isConnected, string colorMode, int delay, int numberOfLeds, int brightness, int step, long colorNumber, int version, bool reverse, DateTime lastReceived);

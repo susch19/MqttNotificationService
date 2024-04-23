@@ -250,7 +250,7 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
 
     public async Task Handle(DoorbellObject message)
     {
-        if (message.Action == "pressed")
+        if (message.State)
         {
             foreach (var item in userSettings.Where(x => x.ReceiveDoorbellNotifications))
             {

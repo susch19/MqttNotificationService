@@ -78,7 +78,7 @@ async Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageRece
     if (e.ApplicationMessage.Topic == "zigbee2mqtt/Türklingel")
     {
         var obj = System.Text.Json.JsonSerializer.Deserialize<DoorbellObject>(payload)!;
-        if (obj.Action == "pressed")
+        if (obj.State)
             new ToastContentBuilder()
                 .AddText("Es hat geklingelt")
                 .Show();
@@ -100,6 +100,8 @@ public class DoorbellObject
 {
     [JsonPropertyName("action")]
     public string Action { get; set; }
+    [JsonPropertyName("state")]
+    public bool State { get; set; }
 }
 
 public class LedStripState
