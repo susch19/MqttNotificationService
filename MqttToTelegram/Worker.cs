@@ -44,9 +44,10 @@ public class Worker : BackgroundService
                 {
                     await mqttClient.ConnectAsync(mqttClientOptions, stoppingToken);
 
-                    Console.WriteLine("The MQTT client is connected.");
+                    _logger.LogInformation($"The MQTT client is connected.");
+
                     var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder()
-                        .WithTopicFilter(f => f.WithTopic("zigbee2mqtt/Türklingel"))
+                        .WithTopicFilter(f => f.WithTopic("zigbee2mqtt"))
                         .WithTopicFilter(f => f.WithTopic("painless2mqtt/0x000000002d8909fe/state"))
                     .Build();
 
@@ -69,6 +70,7 @@ public class Worker : BackgroundService
     async Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs e)
     {
         var payload = e.ApplicationMessage.ConvertPayloadToString();
+        _logger.LogInformation($"Received: {e.ApplicationMessage.Topic}\r\n{payload}");
 
         if (e.ApplicationMessage.Topic == "zigbee2mqtt/Türklingel")
         {
