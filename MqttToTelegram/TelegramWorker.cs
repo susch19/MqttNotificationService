@@ -250,11 +250,12 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
 
     public async Task Handle(DoorbellObject message)
     {
-        if (message.Action != "ring")
-            return;
-        foreach (var item in userSettings.Where(x => x.ReceiveDoorbellNotifications))
+        if (message.Action == "pressed")
         {
-            await bot.SendTextMessageAsync(item.ChatId, "Es hat geklingelt");
+            foreach (var item in userSettings.Where(x => x.ReceiveDoorbellNotifications))
+            {
+                await bot.SendTextMessageAsync(item.ChatId, "Es hat geklingelt");
+            }
         }
     }
 

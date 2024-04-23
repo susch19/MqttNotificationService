@@ -10,7 +10,7 @@ var mqttFactory = new MqttFactory();
 
 using (var mqttClient = mqttFactory.CreateMqttClient())
 {
-    var mqttClientOptions = new MqttClientOptionsBuilder().WithTcpServer("192.168.49.56").Build();
+    var mqttClientOptions = new MqttClientOptionsBuilder().WithTcpServer("192.168.49.123").Build();
 
     // Setup message handling before connecting so that queued messages
     // are also handled properly. When there is no event handler attached all
@@ -36,14 +36,14 @@ using (var mqttClient = mqttFactory.CreateMqttClient())
 
                                 Console.WriteLine("The MQTT client is connected.");
                                 var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder()
-                                    .WithTopicFilter(f => f.WithTopic("esp/doorbell"))
+                                    .WithTopicFilter(f => f.WithTopic("zigbee2mqtt/Türklingel"))
                                     .WithTopicFilter(f => f.WithTopic("painless2mqtt/0x000000002d8909fe/state"))
                                     .Build();
 
                                 await mqttClient.SubscribeAsync(mqttSubscribeOptions, CancellationToken.None);
                             }
                         }
-                        catch (Exception ex) 
+                        catch (Exception ex)
                         {
                             Console.WriteLine(ex.ToString());
                         }
@@ -53,7 +53,7 @@ using (var mqttClient = mqttFactory.CreateMqttClient())
                         }
                     }
                 });
-  
+
     //var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder()
     //    .WithTopicFilter(f => f.WithTopic("esp/doorbell"))
     //    .WithTopicFilter(f => f.WithTopic("painless2mqtt/0x000000002d8909fe/state"))
@@ -75,15 +75,13 @@ async Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageRece
 {
     var payload = e.ApplicationMessage.ConvertPayloadToString();
     var asd = 5 + 5;
-    if (e.ApplicationMessage.Topic == "esp/doorbell")
+    if (e.ApplicationMessage.Topic == "zigbee2mqtt/Türklingel")
     {
         var obj = System.Text.Json.JsonSerializer.Deserialize<DoorbellObject>(payload)!;
-
-        new ToastContentBuilder()
-            .AddText("Es hat geklingelt")
-            .AddText($"BootUp: {obj.BootTime / 1000000d}s")
-            .AddText($"Laufzeit: {obj.TimeOnDevice / 1000000d}s")
-            .Show();
+        if (obj.Action == "pressed")
+            new ToastContentBuilder()
+                .AddText("Es hat geklingelt")
+                .Show();
     }
     else if (e.ApplicationMessage.Topic == "painless2mqtt/0x000000002d8909fe/state")
     {
@@ -101,8 +99,6 @@ async Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageRece
 public class DoorbellObject
 {
     public string Action { get; set; }
-    public long BootTime { get; set; }
-    public long TimeOnDevice { get; set; }
 }
 
 public class LedStripState
