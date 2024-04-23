@@ -47,7 +47,7 @@ public class Worker : BackgroundService
                     _logger.LogInformation($"The MQTT client is connected.");
 
                     var mqttSubscribeOptions = mqttFactory.CreateSubscribeOptionsBuilder()
-                        .WithTopicFilter(f => f.WithTopic("zigbee2mqtt"))
+                        .WithTopicFilter(f => f.WithTopic("zigbee2mqtt/Türklingel"))
                         .WithTopicFilter(f => f.WithTopic("painless2mqtt/0x000000002d8909fe/state"))
                     .Build();
 
@@ -56,7 +56,7 @@ public class Worker : BackgroundService
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Something went wrong during mqtt client ping or connection");
             }
             finally
             {
@@ -64,8 +64,6 @@ public class Worker : BackgroundService
             }
         }
     }
-
-
 
     async Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs e)
     {
