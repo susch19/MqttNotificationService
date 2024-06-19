@@ -248,10 +248,12 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
         }
     }
 
+    DateTime lastBellNotification = DateTime.MinValue;
     public async Task Handle(DoorbellObject message)
     {
-        if (message.State)
+        if (message.State && lastBellNotification.AddSeconds(2) < DateTime.UtcNow)
         {
+            lastBellNotification = DateTime.UtcNow;
             foreach (var item in userSettings.Where(x => x.ReceiveDoorbellNotifications))
             {
                 await bot.SendTextMessageAsync(item.ChatId, "Es hat geklingelt");
