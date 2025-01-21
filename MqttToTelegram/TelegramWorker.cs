@@ -22,6 +22,7 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
     private Dictionary<long, (int, DateTimeOffset)> registerKeys = new();
     List<UserSettings> userSettings = new();
     private DateTime lastBellNotification = DateTime.MinValue;
+    private SemaphoreSlim doorbellSemaphore = new(1, 1);
     public TelegramWorker(ILogger<Worker> logger, TelegramBotClient telegram, IConfiguration configuration)
     {
         _logger = logger;
@@ -254,13 +255,21 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
 
     public async Task Handle(DoorbellObject message)
     {
-        if (message.State && lastBellNotification.AddSeconds(telegramSettings.WaitBetweenPressesInSeconds) < DateTime.UtcNow)
+        doorbellSemaphore.Wait();
+        try
         {
-            lastBellNotification = DateTime.UtcNow;
-            foreach (var item in userSettings.Where(x => x.ReceiveDoorbellNotifications))
+            if (message.State && lastBellNotification.AddSeconds(telegramSettings.WaitBetweenPressesInSeconds) < DateTime.UtcNow)
             {
-                await bot.SendTextMessageAsync(item.ChatId, "Es hat geklingelt");
+                lastBellNotification = DateTime.UtcNow;
+                foreach (var item in userSettings.Where(x => x.ReceiveDoorbellNotifications))
+                {
+                    await bot.SendTextMessageAsync(item.ChatId, "Es hat geklingelt");
+                }
             }
+        }
+        finally
+        {
+            doorbellSemaphore.Release();
         }
     }
 
