@@ -74,7 +74,7 @@ using (var mqttClient = mqttFactory.CreateMqttClient())
 async Task MqttClient_ApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs e)
 {
     var payload = e.ApplicationMessage.ConvertPayloadToString();
-    var asd = 5 + 5;
+
     if (e.ApplicationMessage.Topic == "zigbee2mqtt/Türklingel")
     {
         var obj = System.Text.Json.JsonSerializer.Deserialize<DoorbellObject>(payload)!;

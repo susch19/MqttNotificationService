@@ -8,6 +8,7 @@ using File = System.IO.File;
 using Rebus.Handlers;
 using Telegram.Bot.Types.ReplyMarkups;
 using Message = Telegram.Bot.Types.Message;
+using static MqttToTelegram.Worker;
 
 namespace MqttToTelegram;
 
@@ -15,15 +16,18 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
 {
     private readonly ILogger<Worker> _logger;
     private readonly TelegramBotClient bot;
+    private readonly TelegramWorkerSettings telegramSettings;
     private int offset = 0;
     private Random random = new();
     private Dictionary<long, (int, DateTimeOffset)> registerKeys = new();
     List<UserSettings> userSettings = new();
-    public TelegramWorker(ILogger<Worker> logger, TelegramBotClient telegram)
+    private DateTime lastBellNotification = DateTime.MinValue;
+    public TelegramWorker(ILogger<Worker> logger, TelegramBotClient telegram, IConfiguration configuration)
     {
         _logger = logger;
 
         bot = telegram;
+        telegramSettings = configuration.GetSection("TelegramWorker").Get<TelegramWorkerSettings>() ?? new TelegramWorkerSettings();
 
 
         Directory.CreateDirectory("db");
@@ -248,10 +252,9 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
         }
     }
 
-    DateTime lastBellNotification = DateTime.MinValue;
     public async Task Handle(DoorbellObject message)
     {
-        if (message.State && lastBellNotification.AddSeconds(2) < DateTime.UtcNow)
+        if (message.State && lastBellNotification.AddSeconds(telegramSettings.WaitBetweenPressesInSeconds) < DateTime.UtcNow)
         {
             lastBellNotification = DateTime.UtcNow;
             foreach (var item in userSettings.Where(x => x.ReceiveDoorbellNotifications))

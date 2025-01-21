@@ -97,6 +97,10 @@ public class Worker : BackgroundService
         public string RemotePassword { get; set; }
     }
 
+    public class TelegramWorkerSettings
+    {
+        public int WaitBetweenPressesInSeconds { get; set; } = 10;
+    }
 
 }
 
