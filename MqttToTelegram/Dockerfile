@@ -1,10 +1,10 @@
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 
 ARG TARGETPLATFORM
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim-amd64 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim-amd64 AS build
 WORKDIR /src
 COPY ["MqttToTelegram/MqttToTelegram.csproj", "MqttToTelegram/"]
 RUN dotnet restore "MqttToTelegram/MqttToTelegram.csproj"

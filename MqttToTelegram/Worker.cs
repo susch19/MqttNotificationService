@@ -1,6 +1,4 @@
-using MQTTnet.Client;
 using MQTTnet;
-using MQTTnet.Server;
 using Telegram.Bot;
 using Rebus.Bus;
 using System.Text.Json.Serialization;
@@ -13,7 +11,7 @@ public class Worker : BackgroundService
     private readonly TelegramBotClient telegramBot;
     private readonly IConfiguration configuration;
     private readonly IBus bus;
-    private readonly MqttFactory mqttFactory;
+    private readonly MqttClientFactory mqttFactory;
     private readonly IMqttClient mqttClient;
     private readonly MqttClientOptions mqttClientOptions;
 
@@ -25,7 +23,7 @@ public class Worker : BackgroundService
         this.configuration = configuration;
         this.bus = bus;
         var settings = configuration.GetSection("Mqtt").Get<MqttSettings>();
-        mqttFactory = new MqttFactory();
+        mqttFactory = new MqttClientFactory();
 
         mqttClient = mqttFactory.CreateMqttClient();
 

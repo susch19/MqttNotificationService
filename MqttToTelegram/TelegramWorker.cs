@@ -52,7 +52,7 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var updates = await bot.GetUpdatesAsync(offset, allowedUpdates: [UpdateType.Message, UpdateType.CallbackQuery], timeout: 3600);
+            var updates = await bot.GetUpdates(offset, allowedUpdates: [UpdateType.Message, UpdateType.CallbackQuery], timeout: 3600);
 
             foreach (var update in updates)
             {
@@ -104,7 +104,7 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
                         settings.ReceiveDinnersReadyNotifications = callbackQuery.Data[2] == '1';
                     }
                     settings.Save();
-                    await bot.AnswerCallbackQueryAsync(callbackQuery.Id);
+                    await bot.AnswerCallbackQuery(callbackQuery.Id);
                     //bot.EditMessageReplyMarkupAsync()
                     SendNotificationKeyboard(settings, callbackQuery.Message.MessageId);
                     break;
@@ -139,12 +139,12 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
 
 
                         registerKeys[message.From.Id] = (secondFactor, DateTimeOffset.Now);
-                        bot.SendTextMessageAsync(message.Chat.Id, "Bitte gib den Code ein, welcher dir vom Admin zur Verfügung gestellt wurde.");
+                        bot.SendMessage(message.Chat.Id, "Bitte gib den Code ein, welcher dir vom Admin zur Verfügung gestellt wurde.");
 
                         var adminUser = userSettings.FirstOrDefault(x => x.IsAdmin);
                         if (adminUser is not null)
                         {
-                            bot.SendTextMessageAsync(adminUser.ChatId, $"User: {message.From.FirstName}, {message.From.LastName}, {message.From.Username}\nCode: {secondFactor}");
+                            bot.SendMessage(adminUser.ChatId, $"User: {message.From.FirstName}, {message.From.LastName}, {message.From.Username}\nCode: {secondFactor}");
                         }
                         break;
                     }
@@ -161,7 +161,7 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
                             return;
                         }
 
-                        bot.SendTextMessageAsync(
+                        bot.SendMessage(
                             chatId: settings.ChatId,
                             text: "Removing keyboard",
                             replyMarkup: new ReplyKeyboardRemove());
@@ -173,7 +173,7 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
                             else
                                 settings.ReceiveDoorbellNotifications = !settings.ReceiveDoorbellNotifications;
                             settings.Save();
-                            bot.SendTextMessageAsync(settings.ChatId, $"Du erhälst nun {(settings.ReceiveDoorbellNotifications ? "" : "keine")} Benachrichtungen für die Klingel");
+                            bot.SendMessage(settings.ChatId, $"Du erhälst nun {(settings.ReceiveDoorbellNotifications ? "" : "keine")} Benachrichtungen für die Klingel");
                         }
                         else if (splitted[1].Equals("Essen", StringComparison.OrdinalIgnoreCase))
                         {
@@ -182,7 +182,7 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
                             else
                                 settings.ReceiveDinnersReadyNotifications = !settings.ReceiveDinnersReadyNotifications;
                             settings.Save();
-                            bot.SendTextMessageAsync(settings.ChatId, $"Du erhälst nun {(settings.ReceiveDinnersReadyNotifications ? "" : "keine")} Benachrichtungen für fertiges Essen");
+                            bot.SendMessage(settings.ChatId, $"Du erhälst nun {(settings.ReceiveDinnersReadyNotifications ? "" : "keine")} Benachrichtungen für fertiges Essen");
                         }
                     }
                     break;
@@ -191,7 +191,7 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
                         if (settings is null || !settings.IsAdmin)
                             return;
                         LoadEntries();
-                        bot.SendTextMessageAsync(settings.ChatId, $"Config Reload wurde angestoßen");
+                        bot.SendMessage(settings.ChatId, $"Config Reload wurde angestoßen");
                         break;
                     }
                 default:
@@ -204,16 +204,16 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
             if (setting is null)
                 return;
             if (setting.RegistrationCode < 0)
-                bot.SendTextMessageAsync(message.Chat.Id, "Sie sind bereits authorisiert");
+                bot.SendMessage(message.Chat.Id, "Sie sind bereits authorisiert");
             else if (setting.RegistrationCode == code)
             {
                 setting.RegistrationCode = -1;
                 setting.Save();
-                bot.SendTextMessageAsync(message.Chat.Id, "Erfolgreich authorisiert");
+                bot.SendMessage(message.Chat.Id, "Erfolgreich authorisiert");
 
             }
             if (setting.IsAdmin)
-                bot.SetMyCommandsAsync([new BotCommand { Command = "reload" }], new BotCommandScopeChat() { ChatId = setting.ChatId });
+                bot.SetMyCommands([new BotCommand { Command = "reload" }], new BotCommandScopeChat() { ChatId = setting.ChatId });
         }
     }
 
@@ -238,7 +238,7 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
             """;
         if (editId is null)
         {
-            return await bot.SendTextMessageAsync(chatId: settings.ChatId,
+            return await bot.SendMessage(chatId: settings.ChatId,
                 text: text,
                 replyMarkup: inlineKeyboard
                 );
@@ -246,7 +246,7 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
         }
         else
         {
-            return await bot.EditMessageTextAsync(chatId: settings.ChatId, messageId: editId.Value,
+            return await bot.EditMessageText(chatId: settings.ChatId, messageId: editId.Value,
             text: text,
             replyMarkup: inlineKeyboard);
 
@@ -263,7 +263,7 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
                 lastBellNotification = DateTime.UtcNow;
                 foreach (var item in userSettings.Where(x => x.ReceiveDoorbellNotifications))
                 {
-                    await bot.SendTextMessageAsync(item.ChatId, "Es hat geklingelt");
+                    await bot.SendMessage(item.ChatId, "Es hat geklingelt");
                 }
             }
         }
@@ -280,7 +280,7 @@ public class TelegramWorker : BackgroundService, IHandleMessages<DoorbellObject>
 
         foreach (var item in userSettings.Where(x => x.ReceiveDinnersReadyNotifications))
         {
-            await bot.SendTextMessageAsync(item.ChatId, "Essen ist fertig");
+            await bot.SendMessage(item.ChatId, "Essen ist fertig");
         }
     }
 
